@@ -74,8 +74,12 @@ class PostsController extends Controller
      */
     public function show($slug)
     {
-        return view('blog.show')
-            ->with('post', Post::where('slug', $slug)->first());
+        $post = Post::where('slug', $slug)->first();
+        if ($post) {
+            return view('blog.show')
+            ->with('post', $post);
+        }
+        return abort(404);
     }
 
     /**
@@ -86,8 +90,12 @@ class PostsController extends Controller
      */
     public function edit($slug)
     {
-        return view('blog.edit')
+        $post = Post::where('slug', $slug)->first();
+        if ($post) {
+            return view('blog.edit')
             ->with('post', Post::where('slug', $slug)->first());
+        }
+        abort(404);
     }
 
     /**
@@ -125,9 +133,12 @@ class PostsController extends Controller
     public function destroy($slug)
     {
         $post = Post::where('slug', $slug)->first();
-        $post->delete();
-
-        return redirect('/blog')
-            ->with('message', 'Đã xóa ' . $post->title);
+        if (isset($post)) {
+            $post->delete();
+            return redirect('/blog')
+                ->with('message', 'Đã xóa ' . $post->title);
+        } else {
+            return redirect('/');
+        }
     }
 }
